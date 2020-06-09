@@ -55,7 +55,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 		for (int x = 0; x < maxRecord; x++) {
 			result.add(emps.get(x + offset));
 		}
-
+		System.out.println("RESULTTTTTTTTTTTTTTTTTt");
+		System.out.println(result.size());
 		return result;
 	}
 

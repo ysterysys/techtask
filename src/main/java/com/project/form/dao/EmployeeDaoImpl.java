@@ -92,7 +92,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
 		String sql = "SELECT * FROM emp where salary between " + salaryFrom + " and " + salaryTo + " order by " + column
 				+ " " + sortBy;
-
+System.out.println(sql);
 		List<Employee> result = namedParameterJdbcTemplate.query(sql, new UserMapper());
 
 		return result;
