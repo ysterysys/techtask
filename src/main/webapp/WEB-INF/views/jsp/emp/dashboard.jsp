@@ -147,10 +147,10 @@
 							value="/emp/${user.id}/delete" var="deleteUrl" /> <spring:url
 							value="/emp/${user.id}/update" var="updateUrl" />
 
-						<button class="btn btn-info" onclick="location.href='${viewUrl}'">Query</button>
+						<button class="btn btn-info" onclick="location.href='${viewUrl}'"><span class="glyphicon glyphicon-zoom-in"></span> Query</button>
 						<button class="btn btn-primary"
-							onclick="location.href='${updateUrl}'">Update</button>
-						<button class="btn btn-danger" onclick=confirmDelete('${deleteUrl}')>Delete</button></td>
+							onclick="location.href='${updateUrl}'"><span class="glyphicon glyphicon-pencil"></span> Update</button>
+						<button class="btn btn-danger" onclick=confirmDelete('${deleteUrl}')><span class="glyphicon glyphicon-trash"></span> Delete</button></td>
 					</td>
 				</tr>
 			</c:forEach>

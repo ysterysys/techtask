@@ -37,8 +37,6 @@ public class EmployeeController {
 
 	private final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
-
-
 	private EmployeeService employeeService;
 
 	@Autowired
@@ -68,8 +66,8 @@ public class EmployeeController {
 
 	// list page
 	@RequestMapping(value = "/emp/searchUserBySalary", method = RequestMethod.GET)
-	public String searchUser(@ModelAttribute("userSearchForm") searchForm searchForm, BindingResult result,
-			Model model, final RedirectAttributes redirectAttributes) {
+	public String searchUser(@ModelAttribute("userSearchForm") searchForm searchForm, BindingResult result, Model model,
+			final RedirectAttributes redirectAttributes) {
 		logger.debug("showAllUsers()");
 		model.addAttribute("users", employeeService.findAllByType(searchForm.getOrderBy() + searchForm.getType(),
 				searchForm.getMinSalary(), searchForm.getMaxSalary(), 0, 30));
@@ -83,9 +81,7 @@ public class EmployeeController {
 		model.addAttribute("maxSalary", searchForm.getMaxSalary());
 		model.addAttribute("type", searchForm.getType());
 		model.addAttribute("orderBy", searchForm.getOrderBy());
-		// model.addAttribute("sort",searchForm.getOrderBy()+searchForm.getType());
-		System.out.println("AFTER CEILING");
-		System.out.println(Math.ceil(totalSize / 30));
+
 		return "emp/dashboard";
 	}
 
@@ -125,56 +121,57 @@ public class EmployeeController {
 	// save or update user
 	@RequestMapping(value = "/emp/savefile", method = RequestMethod.POST)
 
-	public String userFileUpload(@RequestParam("file") MultipartFile[] files, final RedirectAttributes redirectAttributes,
-			HttpServletResponse response) throws Exception {
+	public String userFileUpload(@RequestParam("file") MultipartFile[] files,
+			final RedirectAttributes redirectAttributes, HttpServletResponse response) throws Exception {
 		logger.debug("file upload()");
-		for(MultipartFile file: files ) {
-		if(file.getBytes().length <=3) {
-			throw new Exception("File is Empty ! ");
-		};
-		logger.debug("nunmber of times");
-		BufferedReader br;
-		try {
-			String line;
-			InputStream is = file.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
-			logger.debug("reading file");
-			// skip first line
-			br.readLine();
-			while ((line = br.readLine()) != null) {
-		
-				String[] values = line.split(",");
-				if (values[0].charAt(0) == '#') {
-					continue;
-				}
-				if(values.length>4) {
-					throw new Exception("record contain incorrect number of fields");
-				}
-				if(values.length<4) {
-					throw new Exception("record contain incorrect number of fields");
-				}
-				Employee emp = new Employee();
-				emp.setId(values[0]);
-				emp.setLogin(values[1]);
-				emp.setName(values[2]);
-				if(Integer.parseInt(values[3])>=0) {
-					emp.setSalary(values[3]);
-				}else {
-					throw new Exception("Salary must be >= 0");
-				}
-				
-				if (validateInput(emp)) {
-					employeeService.saveOrUpdate(emp);
-				
-				} else {
-					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					throw new Exception("User Login already existed, file will not be processed");
-				}
-
+		for (MultipartFile file : files) {
+			if (file.getBytes().length <= 3) {
+				throw new Exception("File is Empty ! ");
 			}
-		} catch (IOException e) {
-			logger.debug(e.getMessage());
-		}
+			;
+			logger.debug("nunmber of times");
+			BufferedReader br;
+			try {
+				String line;
+				InputStream is = file.getInputStream();
+				br = new BufferedReader(new InputStreamReader(is));
+				logger.debug("reading file");
+				// skip first line
+				br.readLine();
+				while ((line = br.readLine()) != null) {
+
+					String[] values = line.split(",");
+					if (values[0].charAt(0) == '#') {
+						continue;
+					}
+					if (values.length > 4) {
+						throw new Exception("record contain incorrect number of fields");
+					}
+					if (values.length < 4) {
+						throw new Exception("record contain incorrect number of fields");
+					}
+					Employee emp = new Employee();
+					emp.setId(values[0]);
+					emp.setLogin(values[1]);
+					emp.setName(values[2]);
+					if (Integer.parseInt(values[3]) >= 0) {
+						emp.setSalary(values[3]);
+					} else {
+						throw new Exception("Salary must be >= 0");
+					}
+
+					if (validateInput(emp)) {
+						employeeService.saveOrUpdate(emp);
+
+					} else {
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						throw new Exception("User Login already existed, file will not be processed");
+					}
+
+				}
+			} catch (IOException e) {
+				logger.debug(e.getMessage());
+			}
 		}
 		redirectAttributes.addFlashAttribute("css", "success");
 		redirectAttributes.addFlashAttribute("msg", "File Uploaded successfully!");
@@ -202,31 +199,38 @@ public class EmployeeController {
 
 	// save or update user
 	@RequestMapping(value = "/emp", method = RequestMethod.POST)
-	public String saveOrUpdateUser(@ModelAttribute("userForm") Employee employee, BindingResult result,
-			Model model, final RedirectAttributes redirectAttributes) {
+	public String saveOrUpdateUser(@ModelAttribute("userForm") Employee employee, BindingResult result, Model model,
+			final RedirectAttributes redirectAttributes) {
 
 		logger.debug("saveOrUpdateUser() : {}", employee);
 
 		try {
 			redirectAttributes.addFlashAttribute("css", "success");
-			
-			employeeService.saveOrUpdate(employee);
-			
-			if (employee.isNew()) {
-				redirectAttributes.addFlashAttribute("msg", "User added successfully!");
+
+			Employee existingLogin = employeeService.findEmpByLogin(employee.getLogin());
+
+			if (existingLogin == null) {
+				employeeService.saveOrUpdate(employee);
+
+				if (employee.isNew()) {
+					redirectAttributes.addFlashAttribute("msg", "User added successfully!");
+				} else {
+					redirectAttributes.addFlashAttribute("msg", "User updated successfully!");
+				}
+
+				return "redirect:/emp/" + employee.getId();
 			} else {
-				redirectAttributes.addFlashAttribute("msg", "User updated successfully!");
+
+				redirectAttributes.addFlashAttribute("css", "danger");
+				redirectAttributes.addFlashAttribute("msg", "Error ! Login Name already exist");
+				return "redirect:/emp/" + employee.getId();
 			}
 
-			
-			return "redirect:/emp/" + employee.getId();
-		}catch(Exception e) {
-			model.addAttribute("css", "danger");
-			model.addAttribute("msg", "Error ! Unable to update");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("css", "success");
+			redirectAttributes.addFlashAttribute("msg", "Error ! Unable to update");
 			return "redirect:/emp/" + employee.getId();
 		}
-			
-
 
 	}
 
@@ -242,42 +246,38 @@ public class EmployeeController {
 		return "emp/userform";
 
 	}
-	
-	// show update form
+
 	// delete user
-	// delete user
-		@RequestMapping(value = "/emp/{id}/delete", method = RequestMethod.POST)
-		public String deleteUser(@PathVariable("id") String id, final RedirectAttributes redirectAttributes) {
+	@RequestMapping(value = "/emp/{id}/delete", method = RequestMethod.POST)
+	public String deleteUser(@PathVariable("id") String id, final RedirectAttributes redirectAttributes) {
 
-			logger.debug("deleteUser() : {}", id);
+		logger.debug("deleteUser() : {}", id);
 
-			employeeService.delete(id);
-			
-			redirectAttributes.addFlashAttribute("css", "success");
-			redirectAttributes.addFlashAttribute("msg", "User is deleted!");
-			
-			return "redirect:/emp/dashboard";
+		employeeService.delete(id);
 
-		}
-	
+		redirectAttributes.addFlashAttribute("css", "success");
+		redirectAttributes.addFlashAttribute("msg", "User is deleted!");
+
+		return "redirect:/emp/dashboard";
+
+	}
 
 	// show user
 	@RequestMapping(value = "/emp/{id}", method = RequestMethod.GET)
-	public String showUser(@PathVariable("id") String id, Model model) {
+	public String showUser(@PathVariable("id") String id, Model model, final RedirectAttributes redirectAttributes) {
 
 		logger.debug("showUser() id: {}", id);
 
 		Employee emp = employeeService.findById(id);
 		if (emp == null) {
-			model.addAttribute("css", "danger");
-			model.addAttribute("msg", "User not found");
+			redirectAttributes.addFlashAttribute("css", "danger");
+			redirectAttributes.addFlashAttribute("msg", "User not found");
 		}
 		model.addAttribute("user", emp);
 
 		return "emp/show";
 
 	}
-
 
 	@ExceptionHandler(EmptyResultDataAccessException.class)
 	public ModelAndView handleEmptyData(HttpServletRequest req, Exception ex) {
@@ -293,43 +293,23 @@ public class EmployeeController {
 
 	}
 
-
-//	@RequestMapping(value = "/emp", method = RequestMethod.GET, produces = "application/json")
-//	@ResponseBody
-//	public List<Employee> searchUser(@RequestParam(value = "minSalary") String minSalary,
-//			@RequestParam(value = "maxSalary") String maxSalary, @RequestParam(value = "offset") int offset,
-//			@RequestParam(value = "limit") int limit, @RequestParam(value = "sort") String sort,
-//			HttpServletResponse response) {
-//		logger.debug("userss11 list()");
-//		System.out.println(minSalary);
-//		try {
-//			return employeeService.findAllByType(sort, minSalary, maxSalary, offset, limit);
-//		} catch (Exception e) {
-//			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//			return null;
-//		}
-//		
-//
-//	}
-	
 	@ModelAttribute("sortList")
-	   public Map<String, String> getSortList() {
-	      Map<String, String> sortList = new HashMap<String, String>();
-	      sortList.put("+", "Ascending");
-	      sortList.put("-", "Descending");
-	     
-	      return sortList;
-	   }
+	public Map<String, String> getSortList() {
+		Map<String, String> sortList = new HashMap<String, String>();
+		sortList.put("+", "Ascending");
+		sortList.put("-", "Descending");
 
-	
+		return sortList;
+	}
+
 	@ModelAttribute("columnList")
-	   public Map<String, String> getColumnList() {
-	      Map<String, String> columnList = new HashMap<String, String>();
-	      columnList.put("id", "ID");
-	      columnList.put("name", "NAME");
-	      columnList.put("login", "LOGIN");
-	      columnList.put("salary", "SALARY");
-	     
-	      return columnList;
-	   }
+	public Map<String, String> getColumnList() {
+		Map<String, String> columnList = new HashMap<String, String>();
+		columnList.put("id", "ID");
+		columnList.put("name", "NAME");
+		columnList.put("login", "LOGIN");
+		columnList.put("salary", "SALARY");
+
+		return columnList;
+	}
 }

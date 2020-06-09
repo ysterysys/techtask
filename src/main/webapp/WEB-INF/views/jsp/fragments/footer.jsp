@@ -2,7 +2,7 @@
 <div class="container">
 	<hr>
 	<footer>
-		<p>&copy; project.com 2015</p>
+		<p>&copy; project 2020</p>
 	</footer>
 </div>
 

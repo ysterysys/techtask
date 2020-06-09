@@ -31,9 +31,6 @@ Select File: <input type="file" name="file" multiple/>
 			</br>
 			<input type="submit" value="Upload File" />
 		</form:form>
-		<%-- 	<form:form class="form-horizontal" method="post" modelAttribute="userForm" action="${userActionUrl}"> --%>
-		<!-- 		<button type="submit" class="btn-lg btn-primary pull-right">Add</button> -->
-		<%-- 	</form:form> --%>
 	</div>
 
 

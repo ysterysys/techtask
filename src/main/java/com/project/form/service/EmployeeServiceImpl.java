@@ -23,7 +23,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Employee findById(String id) {
 		return EmployeeDao.findById(id);
 	}
-	
+
 	@Override
 	public Employee findEmpByLogin(String login) {
 		return EmployeeDao.findEmpByLogin(login);
@@ -33,34 +33,34 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<Employee> findAll() {
 		return EmployeeDao.findAll();
 	}
-	
+
 	@Override
-	public List<Employee> findAllByType(String sort , String salaryFrom, String salaryTo, int offset, int limit) {
+	public List<Employee> findAllByType(String sort, String salaryFrom, String salaryTo, int offset, int limit) {
 		List<Employee> emps = EmployeeDao.findAllByType(sort, salaryFrom, salaryTo);
 		List<Employee> result = new ArrayList<Employee>();
-		
+
 		System.out.println(" SQL VALRIABLE ");
-		System.out.println(" SORT :"+sort);
-		System.out.println("Salary from "+salaryFrom);
-		System.out.println("Salary To"+salaryTo);
-		System.out.println("offset" +offset);
-		System.out.println("limit" +limit);
+		System.out.println(" SORT :" + sort);
+		System.out.println("Salary from " + salaryFrom);
+		System.out.println("Salary To" + salaryTo);
+		System.out.println("offset" + offset);
+		System.out.println("limit" + limit);
 		int maxRecord = 0;
 
-		if(emps.size()-offset >= limit ) {
+		if (emps.size() - offset >= limit) {
 			maxRecord = limit;
-		}else {
-			maxRecord = emps.size()-offset;
+		} else {
+			maxRecord = emps.size() - offset;
 		}
 		for (int x = 0; x < maxRecord; x++) {
-			result.add(emps.get(x+offset));
+			result.add(emps.get(x + offset));
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
-	public int findAllByTypeSize(String sort , String salaryFrom, String salaryTo) {
+	public int findAllByTypeSize(String sort, String salaryFrom, String salaryTo) {
 		List<Employee> emps = EmployeeDao.findAllByType(sort, salaryFrom, salaryTo);
 		return emps.size();
 	}
@@ -68,14 +68,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public void saveOrUpdate(Employee emp) {
 
-		if (findById(emp.getId())==null) {
+		if (findById(emp.getId()) == null) {
 			EmployeeDao.save(emp);
 		} else {
 			EmployeeDao.update(emp);
 		}
 
 	}
-	
+
 	@Override
 	public void save(Employee emp) {
 
