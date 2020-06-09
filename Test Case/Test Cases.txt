@@ -1,0 +1,74 @@
+WEB URL : http://localhost:8080/
+Assumption: Data enter should be correct, e.g. parameter , values as there are no validation in place for data type.
+
+User Story 1 - Web Testing
+-------------------------------------------
+1. Concurrent upload of 2 files , emp1.csv , emp2.csv 
+
+-> proceed to Dash Board > search with salary  range 9000 to 9000 
+-> 2 new records will be found
+-> commented record will not be inserted
+
+2. Upload emp3.csv
+
+-> file will be rejected as it is empty
+
+3. Upload emp4.csv 
+
+->file will be rejected as it contain invaid number of data
+
+4. Upload emp5.csv 
+
+-> file will be record as employee salary is <0
+
+*all records in file will not be inserted if 1 record fails
+
+User Story 1 - API
+-------------------------------------------
+1. Same Use case of user story 1 - Web testing can be used 
+
+-> using postman and upload the file:
+
+http://localhost:8080/users/upload
+
+==============================================================================
+==============================================================================
+
+User Story 2 - Web testing
+-------------------------------------------
+1. Proceed to UI , dashboard , fill in the values and click on search button 
+-> result will be display according to the search criteria
+
+User Story 2 - API Testing
+-------------------------------------------
+1. Using postman GET request get list
+
+http://localhost:8080/users?minSalary=0&maxSalary=4000&offset=0&limit=30&sort=+name
+
+==============================================================================
+==============================================================================
+
+User Story 3 - Web Testing 
+-------------------------------------------
+1. Proceed to UI , dash board, fill in values and click on search button
+2. to view , click on query button 
+3. to update, click on update button
+4. to delete, click on delete button
+
+User Story 3 - API testing
+-------------------------------------------
+1. Using postman POST request - create user
+
+http://localhost:8080/users/e001?name=ysyse1&login=ysyse2&salary=1000
+
+2. Using postman PATCH request - Patch user 
+
+http://localhost:8080/users/e001?name=ysyse1&login=ysyse2&salary=3020
+
+3. Using postman DELETE user - delete user 
+
+http://localhost:8080/users/e001
+
+4. Using postman GET request get user
+
+http://localhost:8080/users/EMPLOYEE1
