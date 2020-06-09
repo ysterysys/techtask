@@ -38,12 +38,14 @@ User Story 2 - Web testing
 -------------------------------------------
 1. Proceed to UI , dashboard , fill in the values and click on search button 
 -> result will be display according to the search criteria
+-> max record per page is set to 30
+-> records can be sorted descending or ascending
 
 User Story 2 - API Testing
 -------------------------------------------
 1. Using postman GET request get list
 
-http://localhost:8080/users?minSalary=0&maxSalary=4000&offset=0&limit=30&sort=+name
+->http://localhost:8080/users?minSalary=0&maxSalary=4000&offset=0&limit=30&sort=+name
 
 ==============================================================================
 ==============================================================================
