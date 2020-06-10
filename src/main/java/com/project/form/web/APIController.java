@@ -124,7 +124,7 @@ public class APIController {
 	// create user api
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
-	public void addUserAPI(@PathVariable(value = "id") String id, @RequestParam(value = "name") String name,
+	public Employee addUserAPI(@PathVariable(value = "id") String id, @RequestParam(value = "name") String name,
 			@RequestParam(value = "login") String login, @RequestParam(value = "salary") String salary,
 			HttpServletResponse response) {
 
@@ -138,13 +138,14 @@ public class APIController {
 				employee.setSalary(salary);
 			} else {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return;
+				return null;
 			}
 			employeeService.saveOrUpdate(employee);
+			return employee;
 
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return;
+			return null;
 		}
 
 	}
@@ -178,8 +179,9 @@ public class APIController {
 	}
 
 	// update user api
-	@RequestMapping(value = "/users/{id}", method = { RequestMethod.PATCH, RequestMethod.PUT })
-	public void patchUserAPI(@PathVariable(value = "id") String id, @RequestParam(value = "name") String name,
+	@RequestMapping(value = "/users/{id}", method = { RequestMethod.PATCH, RequestMethod.PUT }, produces = "application/json")
+	@ResponseBody
+	public Employee patchUserAPI(@PathVariable(value = "id") String id, @RequestParam(value = "name") String name,
 			@RequestParam(value = "login") String login, @RequestParam(value = "salary") String salary,
 			HttpServletResponse response) {
 
@@ -194,13 +196,17 @@ public class APIController {
 					employee.setName(name);
 					employee.setSalary(salary);
 					employeeService.saveOrUpdate(employee);
+					return employee;
 				} else {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					return null;
 				}
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return null;
 		}
+		return null;
 
 	}
 
