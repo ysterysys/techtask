@@ -1,5 +1,8 @@
 WEB URL : http://localhost:8080/
-Assumption: Data enter should be correct, e.g. parameter , values as there are no validation in place for data type.
+
+Assumption: 
+1. Data enter should be correct, e.g. parameter , values as there are no validation in place for data type.
+2. All records in a file will be rejected if one error is having issue
 
 User Story 1 - Web Testing
 -------------------------------------------
@@ -31,6 +34,7 @@ User Story 1 - API
 
 http://localhost:8080/users/upload
 
+file param: file
 ==============================================================================
 ==============================================================================
 
@@ -74,3 +78,10 @@ http://localhost:8080/users/e001
 4. Using postman GET request get user
 
 http://localhost:8080/users/EMPLOYEE1
+
+User Story 4 - Web Testing
+-------------------------------------------
+1. Proceed to Portal and upload file using emp6.csv
+2. Message will be prompted while file is loading
+3. Message will be prompted when file is completed.
+4. Verify the records uploaded at dashboard page

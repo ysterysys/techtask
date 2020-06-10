@@ -40,18 +40,21 @@ public class APIController {
 	@RequestMapping(value = "/users/upload", headers = ("content-type=multipart/*"), method = RequestMethod.POST)
 	public void upload(@RequestParam("file") MultipartFile inputFile, HttpServletResponse response) {
 		logger.debug("file upload()");
-
-		BufferedReader br;
+		InputStream is = null; 
+		InputStreamReader isr = null;
+	     
+		BufferedReader br = null;
 		try {
+			
 			String line;
-			InputStream is = inputFile.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
+			is = inputFile.getInputStream();
+			isr = new InputStreamReader(is);
+			br = new BufferedReader(isr);
 			logger.debug("reading file");
 			// skip first line
 			br.readLine();
 			while ((line = br.readLine()) != null) {
-				logger.debug("detailssssss");
-				logger.debug(line);
+				
 				String[] values = line.split(",");
 				if (values[0].charAt(0) == '#') {
 					continue;
@@ -79,11 +82,21 @@ public class APIController {
 					return;
 
 				}
-
+				
 			}
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
+		} finally {
+			try {
+				is.close();
+				isr.close();
+				br.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		
 	}
 
 	// list page
@@ -175,7 +188,7 @@ public class APIController {
 			Employee employee = employeeService.findById(id);
 			if (employee != null) {
 				Employee existingLogin = employeeService.findEmpByLogin(employee.getLogin());
-				if (existingLogin == null) {
+				if (existingLogin == null || existingLogin.getId().equals(employee.getId())) {
 					employee.setId(id);
 					employee.setLogin(login);
 					employee.setName(name);

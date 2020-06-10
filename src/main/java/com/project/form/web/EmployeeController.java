@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.project.form.model.Employee;
 import com.project.form.model.searchForm;
 import com.project.form.service.EmployeeService;
+import com.project.util.UploadedFile;
 
 @Controller
 public class EmployeeController {
@@ -121,23 +122,25 @@ public class EmployeeController {
 	// save or update user
 	@RequestMapping(value = "/emp/savefile", method = RequestMethod.POST)
 
-	public String userFileUpload(@RequestParam("file") MultipartFile[] files,
+	public String userFileUpload(HttpServletRequest servletRequest,
+            @ModelAttribute UploadedFile uploadedFile,
+            BindingResult bindingResult,
 			final RedirectAttributes redirectAttributes, HttpServletResponse response) throws Exception {
 		logger.debug("file upload()");
-		for (MultipartFile file : files) {
-			if (file.getBytes().length <= 3) {
-				throw new Exception("File is Empty ! ");
-			}
-			;
+		MultipartFile multipartFile = uploadedFile.getMultipartFile();
+		
+		//InputStream is = multipartFile.getInputStream();
 			logger.debug("nunmber of times");
-			BufferedReader br;
+			BufferedReader br = null;
+			InputStream is = null;
 			try {
 				String line;
-				InputStream is = file.getInputStream();
+				is = multipartFile.getInputStream();
 				br = new BufferedReader(new InputStreamReader(is));
 				logger.debug("reading file");
 				// skip first line
 				br.readLine();
+			
 				while ((line = br.readLine()) != null) {
 
 					String[] values = line.split(",");
@@ -171,8 +174,11 @@ public class EmployeeController {
 				}
 			} catch (IOException e) {
 				logger.debug(e.getMessage());
+			}finally {
+				br.close();
+				is.close();
 			}
-		}
+		
 		redirectAttributes.addFlashAttribute("css", "success");
 		redirectAttributes.addFlashAttribute("msg", "File Uploaded successfully!");
 		return "redirect:/emp";
@@ -209,7 +215,7 @@ public class EmployeeController {
 
 			Employee existingLogin = employeeService.findEmpByLogin(employee.getLogin());
 
-			if (existingLogin == null) {
+			if (existingLogin == null || existingLogin.getId().equals(employee.getId())) {
 				employeeService.saveOrUpdate(employee);
 
 				if (employee.isNew()) {
